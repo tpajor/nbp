@@ -33,11 +33,3 @@ export default class Input extends React.Component {
     );
   }
 };
-
-/*
-        {(this.props.code !== '') ?
-        :
-          <br />
-        }
-        Historia kursu waluty sprzed kliku dni (wciśnij szczegóły na zapisanej karcie waluty)
-*/

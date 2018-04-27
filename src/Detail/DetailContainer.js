@@ -41,7 +41,7 @@ export default class DetailContainer extends React.Component {
     const { dataForChart } = this.state;
     return (
       <div  className={`col-8 ${style.DetailView}`}>
-        <Clock format={'L HH:mm:ss'} ticking={true} timezone={'CEST'} />
+        <Clock format={'L HH:mm:ss'} ticking={true} timezone={'Europe/Warsaw'} />
         <div className={`${style.Chart}`} ref={this.getWidth}>
           <Input code={this.props.code}
             getDataForChart={this.getDataForChart}
