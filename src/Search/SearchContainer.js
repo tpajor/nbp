@@ -10,14 +10,22 @@ import style from '../App.scss';
 export default class SearchContainer extends React.Component {
   state = { 
     cards: [],
-    temporaryCard: null
+    temporaryCard: null,
+    serverError: false,
   };
 
   searchByCode = (currencyCode) => {
-    axios.get(`http://api.nbp.pl/api/exchangerates/rates/c/${currencyCode}/today/`)
-      .then(res => {
-        this.setState({ temporaryCard: res.data });
-      });
+    if (currencyCode.length > 3 || currencyCode.length < 3) {
+      return ;
+    } else {
+      axios.get(`http://api.nbp.pl/api/exchangerates/rates/c/${currencyCode}/today/`)
+        .then(res => {
+          this.setState({ temporaryCard: res.data, serverError: false, });
+        })
+        .catch(() => {
+          this.setState({ serverError: true, })
+        });
+    }
   };
 
   saveCard = (card) => {
@@ -26,11 +34,19 @@ export default class SearchContainer extends React.Component {
     }));
   };
 
+  resetServerError = () => {
+    console.log('??');
+    this.setState({ serverError: false, });
+  }
+
   render() {
-    const { temporaryCard, cards } = this.state;
+    const { temporaryCard, cards, serverError } = this.state;
     return (
       <div className={`col-4 ${style.SearchView}`}>
-        <Search searchByCode={this.searchByCode}/>
+        <Search searchByCode={this.searchByCode}
+          serverError={serverError}
+          resetServerError={this.resetServerError}
+        />
         {(temporaryCard !== null) ?
           <Card cardData={temporaryCard}
             saveCard={this.saveCard}

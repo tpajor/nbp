@@ -10,7 +10,10 @@ import style from '../App.scss';
 export default class DetailContainer extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { dataForChart: null };
+    this.state = { 
+      dataForChart: null,
+      serverError: false,
+    };
     let contWidth = null;
     this.getWidth = element => {
       this.contWidth = element.offsetWidth * 0.8;
@@ -21,7 +24,10 @@ export default class DetailContainer extends React.Component {
     axios.get(`http://api.nbp.pl/api/exchangerates/rates/c/${this.props.code}/last/${numberOfData}/`)
       .then(res => {
         const chartData = this.prepareDataForChart(res.data);
-        this.setState({ dataForChart: chartData });
+        this.setState({ dataForChart: chartData, serverError: false, });
+      })
+      .catch(() => {
+        this.setState({ serverError: true, });
       });
   };
 
@@ -32,19 +38,25 @@ export default class DetailContainer extends React.Component {
   normalizeDataForChart = (data, i) => {
     const dataNormalizedForChart = {};
     dataNormalizedForChart.name = data.effectiveDate;
-    dataNormalizedForChart.ask = data.ask;
-    dataNormalizedForChart.bid = data.bid;
+    dataNormalizedForChart.kupno = data.ask;
+    dataNormalizedForChart.sprzedaż = data.bid;
     return dataNormalizedForChart;
   };
 
+  resetServerError = () => {
+    this.setState({ serverError: false });
+  };
+
   render() {
-    const { dataForChart } = this.state;
+    const { dataForChart, serverError } = this.state;
     return (
       <div  className={`col-8 ${style.DetailView}`}>
-        <Clock format={'L HH:mm:ss'} ticking={true} timezone={'Europe/Warsaw'} />
+        <Clock format={'YYYY-MM-DD HH:mm:ss'} ticking={true} timezone={'Europe/Warsaw'} />
         <div className={`${style.Chart}`} ref={this.getWidth}>
           <Input code={this.props.code}
             getDataForChart={this.getDataForChart}
+            serverError={serverError}
+            resetServerError={this.resetServerError}
           />
           <Chart dataToPlot={dataForChart}
             contWidth={this.contWidth}
