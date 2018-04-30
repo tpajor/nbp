@@ -12,7 +12,8 @@ export default class DetailContainer extends React.Component {
     super(props);
     this.state = { 
       dataForChart: null,
-      serverError: false,
+      inputError: false,
+      errorMessage: '',
     };
     let contWidth = null;
     this.getWidth = element => {
@@ -21,14 +22,20 @@ export default class DetailContainer extends React.Component {
   }
 
   getDataForChart = (numberOfData) => {
-    axios.get(`http://api.nbp.pl/api/exchangerates/rates/c/${this.props.code}/last/${numberOfData}/`)
-      .then(res => {
-        const chartData = this.prepareDataForChart(res.data);
-        this.setState({ dataForChart: chartData, serverError: false, });
-      })
-      .catch(() => {
-        this.setState({ serverError: true, });
-      });
+    if (isNaN(numberOfData)) {
+      this.setState({ errorMessage: 'Wpisz liczbę', inputError: true });
+    } else if (numberOfData > 250 || numberOfData <= 0) {
+      this.setState({ errorMessage: 'Maksymalna liczba notowań to 250', inputError: true });
+    } else {
+      axios.get(`http://api.nbp.pl/api/exchangerates/rates/c/${this.props.code}/last/${numberOfData}/`)
+        .then(res => {
+          const chartData = this.prepareDataForChart(res.data);
+          this.setState({ dataForChart: chartData, inputError: false, });
+        })
+        .catch(() => {
+          this.setState({ errorMessage: 'Błąd serwera. Spróbuj ponownie', inputError: true, });
+        });
+    }
   };
 
   prepareDataForChart = (dataFromApi) => {
@@ -43,20 +50,16 @@ export default class DetailContainer extends React.Component {
     return dataNormalizedForChart;
   };
 
-  resetServerError = () => {
-    this.setState({ serverError: false });
-  };
-
   render() {
-    const { dataForChart, serverError } = this.state;
+    const { dataForChart, inputError, errorMessage } = this.state;
     return (
       <div  className={`col-8 ${style.DetailView}`}>
         <Clock format={'YYYY-MM-DD HH:mm:ss'} ticking={true} timezone={'Europe/Warsaw'} />
         <div className={`${style.Chart}`} ref={this.getWidth}>
           <Input code={this.props.code}
             getDataForChart={this.getDataForChart}
-            serverError={serverError}
-            resetServerError={this.resetServerError}
+            inputError={inputError}
+            errorMessage={errorMessage}
           />
           <Chart dataToPlot={dataForChart}
             contWidth={this.contWidth}

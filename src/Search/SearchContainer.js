@@ -11,19 +11,20 @@ export default class SearchContainer extends React.Component {
   state = { 
     cards: [],
     temporaryCard: null,
-    serverError: false,
+    inputError: false,
+    errorMessage: '',
   };
 
   searchByCode = (currencyCode) => {
     if (currencyCode.length > 3 || currencyCode.length < 3) {
-      return ;
+      this.setState({ inputError: true, errorMessage: 'Wpisz trzyliterowy kod waluty, np. "USD", "chf"' });
     } else {
       axios.get(`http://api.nbp.pl/api/exchangerates/rates/c/${currencyCode}/today/`)
         .then(res => {
-          this.setState({ temporaryCard: res.data, serverError: false, });
+          this.setState({ temporaryCard: res.data, inputError: false, });
         })
         .catch(() => {
-          this.setState({ serverError: true, })
+          this.setState({ inputError: true, errorMessage: 'Brak notowań waluty lub nieprawidłowy kod waluty' })
         });
     }
   };
@@ -34,18 +35,13 @@ export default class SearchContainer extends React.Component {
     }));
   };
 
-  resetServerError = () => {
-    console.log('??');
-    this.setState({ serverError: false, });
-  }
-
   render() {
-    const { temporaryCard, cards, serverError } = this.state;
+    const { temporaryCard, cards, inputError, errorMessage } = this.state;
     return (
       <div className={`col-4 ${style.SearchView}`}>
         <Search searchByCode={this.searchByCode}
-          serverError={serverError}
-          resetServerError={this.resetServerError}
+          inputError={inputError}
+          errorMessage={errorMessage}
         />
         {(temporaryCard !== null) ?
           <Card cardData={temporaryCard}
