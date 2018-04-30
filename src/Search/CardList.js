@@ -7,11 +7,12 @@ const CardList = (props) => {
     <div>
       {props.cards.map(card => 
         <Card key={uuidv4()}
+          deleteCard={props.deleteCard}
           cardData={card}
           isTemporary={false}
           showDetails={props.showDetails}
         />
-      )}
+      ).reverse()}
     </div>
   );
 };

@@ -35,6 +35,12 @@ export default class SearchContainer extends React.Component {
     }));
   };
 
+  deleteCard = (cardToDelete) => {
+    this.setState(prevState => ({
+      cards: prevState.cards.filter(card => card !== cardToDelete)
+    }));
+  };
+
   render() {
     const { temporaryCard, cards, inputError, errorMessage } = this.state;
     return (
@@ -52,6 +58,7 @@ export default class SearchContainer extends React.Component {
           <br />
         }
         <CardList cards={cards}
+          deleteCard={this.deleteCard}
           showDetails={this.props.showDetails}
         />
       </div>

@@ -20,6 +20,10 @@ const Card = (props) => {
           <p className={style.CardMainCellText}>
           {props.cardData.rates[0].bid}
           </p>
+          {props.isTemporary ? 
+            '' :
+            <button className={style.DeleteCardButton} onClick={() => props.deleteCard(props.cardData)}>X</button>
+          }
         </div>
       </div>
       <div className={style.CardNameCell}>

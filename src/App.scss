@@ -59,6 +59,17 @@
 
 .Right {
   border-style: none none solid solid;
+  position: relative;
+}
+
+.DeleteCardButton {
+  position: absolute;
+  border: none;
+  background-color: white;
+  right: 1px;
+  top: 1px;
+  cursor: pointer;
+  color: gray;
 }
 
 .CardNameCell {
